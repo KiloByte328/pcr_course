@@ -20,25 +20,26 @@ int main(int argc, char** argv)
     for (size_t grid_walker = 0; grid_walker < n; grid_walker++)
     {
         Div = Matr[grid_walker * m + grid_walker];
-       /*  printf("checking the prelast and last numbers in grid: %f %f\nDiv is: %f\n", Matr[(n-1) * (m-2)], Div);     */
         if (Matr[grid_walker * m + grid_walker] == 0.0)
             return 1;
         if (Matr[grid_walker * m + grid_walker] != 1) {
             for (size_t x = grid_walker; x < m; x++)
             {
-                Matr[grid_walker * m + x] = Matr[grid_walker * m + grid_walker] >= 1 ? (Matr[grid_walker * m + x] / Div) : (Matr[grid_walker * m + x] * (1 / Div));
+                Matr[grid_walker * m + x] = Matr[grid_walker * m + grid_walker] >= 1 ?
+                (Matr[grid_walker * m + x] / Div) : (Matr[grid_walker * m + x] * (1 / Div));
             }
         }
         for (size_t y = grid_walker + 1; y < n; y++)
         {
-            y + 1 != n ? (y == grid_walker ? y++ : y) : y;
-            Div = Matr[y * m + grid_walker] >= 1 ? Matr[y * m + grid_walker] / Matr[grid_walker * m + grid_walker] : Matr[y * m + grid_walker] * (1 / Matr[grid_walker * m + grid_walker]);
+            Div = Matr[y * m + grid_walker] >= 1 ? Matr[y * m + grid_walker] / Matr[grid_walker * m + grid_walker]
+            : Matr[y * m + grid_walker] * (1 / Matr[grid_walker * m + grid_walker]);
             for(size_t x = grid_walker; x < m; x++)
             {
                 Matr[y * m + x] = Matr[y * m + x] - (Div * Matr[grid_walker * m + x]);
             }
         }
     }
+    double first = MPI_Wtime();
     for (size_t grid_back = n - 1; grid_back >= 1; grid_back--)
     {
         for (size_t y = grid_back - 1; y > 0; y--) 
@@ -51,10 +52,10 @@ int main(int argc, char** argv)
         }
     }
     double end = MPI_Wtime() - now;
-    for (size_t y = 0; y != 2000; y++)
+/*     for (size_t y = 0; y != 2000; y++)
     {
         printf ("y = %d, x = %d: %f, sum: %f\n", y, y, Matr[y*m + y], Matr[y * m + m-1]);
-    }
-    printf("Time of work is: %f \n", end);
+    } */
+    printf("Time of first iteration is: %f\nTime of work is: %f \n", first - now, end);
     return 0;
 }
