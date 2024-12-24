@@ -116,6 +116,7 @@ int main(int argc, char** argv) {
         }
     }
   }
+  MPI_Allreduce(&Others, MPI_IN_PLACE, 1, row, MPI_SUM, MPI_COMM_WORLD);
   rank == 0 ? printf("Time of work is: %f\n", MPI_Wtime() - now) : 0;
   free(Matr);
   free(Others);
