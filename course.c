@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
   MPI_Comm_size(MPI_COMM_WORLD, &commsize);
   srand(rank);
   int n = 3000;
-  int m = n * 2;
+  int m = n + 1;
   int my_begin = rank == 0 ? 0 : rank * (n / commsize);
   int my_end = rank == commsize - 1 ? n : (rank + 1) * (n / commsize);
   int my_part = my_end - my_begin;
@@ -71,6 +71,7 @@ int main(int argc, char** argv) {
         }
     }
   }
+  printf("end of 1\n");
   for (int grid_back = n - 1; grid_back >= 1; grid_back--) {
     if (grid_back >= my_begin && grid_back < my_end) {
       int ehh = rank == commsize - 1 ? n - grid_back: (rank + 1) * (n / commsize) - grid_back; 
@@ -117,18 +118,21 @@ int main(int argc, char** argv) {
         } 
     }
   }
+  MPI_Type_free(&row);
+  printf("end of 2\n");
   for(int y = 0; y < n; y++)
   {
 	  if (y >= my_begin && y < my_end)
-		MPI_Bcast(&Matr[y % my_part * n + n], n, MPI_DOUBLE, rank, MPI_COMM_WORLD);
+		MPI_Bcast(&Matr[y % my_part * n + n], m - n, MPI_DOUBLE, rank, MPI_COMM_WORLD);
 	  else
-		MPI_Bcast(&Res[y * (m - n)],  n, MPI_DOUBLE, (y >= n - n % commsize ? commsize - 1: get_rnk(commsize, n, y)), MPI_COMM_WORLD);
+		MPI_Bcast(&Res[y * (m - n)],  m - n, MPI_DOUBLE, (y >= n - n % commsize ? commsize - 1: get_rnk(commsize, n, y)), MPI_COMM_WORLD);
   }
+  printf("end of 3\n");
   for (int y = 0; y < my_part; y++)
   {
 	for(int x = 0; x < m - n; x++)
 	{
-		Res[my_begin + (y * n) + x] = Matr[y * m + n + x];
+		Res[my_begin + (y * m - n) + x] = Matr[y * (m - n) + n + x];
 	}
   }
   MPI_Barrier(MPI_COMM_WORLD);
